@@ -7,10 +7,18 @@ interface PortEntry {
   manufacturer?: string;
 }
 
+export interface DeviceInfo {
+  id: string;
+  port: string;
+  name: string;
+}
+
 export interface SerialState {
   ports: PortEntry[];
   connected: boolean;
   currentPort: string;
+  devices: DeviceInfo[];
+  activeDeviceId: string;
   attitude: AttitudeData | null;
   rawImu: RawImuData | null;
   attitudeHistory: AttitudeData[];
@@ -27,6 +35,8 @@ export function useSerial() {
     ports: [],
     connected: false,
     currentPort: "",
+    devices: [],
+    activeDeviceId: "",
     attitude: null,
     rawImu: null,
     attitudeHistory: [],
@@ -116,7 +126,16 @@ export function useSerial() {
 
       portRef.current = port;
       connectedRef.current = true;
-      setState((s) => ({ ...s, connected: true, currentPort: path }));
+      const shortName = path.split("/").pop() || path;
+      const deviceId = `dev_${Date.now()}`;
+      const device: DeviceInfo = { id: deviceId, port: path, name: shortName };
+      setState((s) => ({
+        ...s,
+        connected: true,
+        currentPort: path,
+        devices: [...s.devices.filter((d) => d.port !== path), device],
+        activeDeviceId: deviceId,
+      }));
     } catch (e: any) {
       const msg = e?.message || e?.toString() || "Connection failed";
       console.error("Connect failed:", e);
@@ -143,6 +162,7 @@ export function useSerial() {
       ...s,
       connected: false,
       currentPort: "",
+      activeDeviceId: "",
       fps: 0,
       error: null,
     }));

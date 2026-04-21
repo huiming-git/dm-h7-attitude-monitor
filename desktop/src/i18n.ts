@@ -16,6 +16,10 @@ const messages = {
     yaw: "Yaw",
     eulerWave: "Euler Angles",
     notConnected: "Not connected",
+    uploadModel: "Upload Model",
+    resetModel: "Reset",
+    devices: "Devices",
+    noDevice: "No device",
   },
   zh: {
     brand: "Monitor",
@@ -34,6 +38,10 @@ const messages = {
     yaw: "偏航",
     eulerWave: "欧拉角波形",
     notConnected: "未连接",
+    uploadModel: "上传模型",
+    resetModel: "重置",
+    devices: "设备",
+    noDevice: "暂无设备",
   },
 } as const;
 
