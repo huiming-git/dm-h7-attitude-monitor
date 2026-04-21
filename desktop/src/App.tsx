@@ -2,6 +2,7 @@ import Attitude3D from "./components/Attitude3D";
 import DataPanel from "./components/DataPanel";
 import WaveChart from "./components/WaveChart";
 import SerialPort from "./components/SerialPort";
+import ConnectDialog from "./components/ConnectDialog";
 import { useSerial } from "./hooks/useSerial";
 import "./App.css";
 
@@ -10,12 +11,22 @@ function App() {
 
   return (
     <div className="flex h-screen overflow-hidden">
+      {/* ── Connect Dialog ── */}
+      {serial.pendingPort && !serial.connected && (
+        <ConnectDialog
+          port={serial.pendingPort}
+          onConnect={serial.connect}
+          onDismiss={serial.dismissPending}
+          error={serial.error}
+        />
+      )}
+
       {/* ── Sidebar ── */}
       <nav className="flex flex-col bg-surface-container-low w-52 h-full py-4 px-3 shrink-0">
         {/* Brand */}
         <div className="flex items-center gap-2.5 px-2 mb-4">
           <div className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center font-headline font-bold text-xs">
-            H7
+            M
           </div>
           <div>
             <div className="font-headline text-on-surface font-bold text-[13px] leading-tight">Monitor</div>
@@ -23,13 +34,11 @@ function App() {
           </div>
         </div>
 
-        {/* Serial Connection */}
+        {/* Serial Status */}
         <SerialPort
           ports={serial.ports}
           connected={serial.connected}
           currentPort={serial.currentPort}
-          onScan={serial.scanPorts}
-          onConnect={serial.connect}
           onDisconnect={serial.disconnect}
         />
 
@@ -53,14 +62,11 @@ function App() {
 
       {/* ── Main ── */}
       <div className="flex flex-col flex-1 h-full overflow-hidden">
-        {/* Content */}
         <main className="flex-1 flex overflow-hidden">
           {/* Center: 3D + Wave */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* 3D Viewport */}
             <div className="flex-1 min-h-0 bg-surface-container-low bg-grid-pattern relative">
               <Attitude3D attitude={serial.attitude} />
-              {/* Quick RPY readout */}
               {serial.attitude && (
                 <div className="absolute top-3 right-3 glass rounded-md px-3 py-1.5 flex gap-3 text-[11px] font-mono font-medium ambient-shadow-sm">
                   <span className="text-roll">R {serial.attitude.roll.toFixed(1)}°</span>
@@ -69,7 +75,6 @@ function App() {
                 </div>
               )}
             </div>
-            {/* Waveform (inline, compact) */}
             <div className="h-48 shrink-0 bg-surface border-t border-outline-variant/10 px-4 py-2">
               <WaveChart history={serial.attitudeHistory} />
             </div>
