@@ -1,12 +1,16 @@
+import { useState } from "react";
 import Attitude3D from "./components/Attitude3D";
 import DataPanel from "./components/DataPanel";
 import WaveChart from "./components/WaveChart";
 import SerialPort from "./components/SerialPort";
 import { useSerial } from "./hooks/useSerial";
+import { t, type Lang } from "./i18n";
 import "./App.css";
 
 function App() {
   const serial = useSerial();
+  const [lang, setLang] = useState<Lang>("zh");
+  const m = t(lang);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -17,10 +21,18 @@ function App() {
           <div className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center font-headline font-bold text-xs">
             M
           </div>
-          <div>
-            <div className="font-headline text-on-surface font-bold text-[13px] leading-tight">Monitor</div>
-            <div className="text-on-surface-variant text-[11px]">Attitude Visualizer</div>
+          <div className="flex-1 min-w-0">
+            <div className="font-headline text-on-surface font-bold text-[13px] leading-tight">{m.brand}</div>
+            <div className="text-on-surface-variant text-[11px]">{m.subtitle}</div>
           </div>
+          {/* Lang toggle */}
+          <button
+            onClick={() => setLang(lang === "zh" ? "en" : "zh")}
+            className="px-1.5 py-0.5 rounded bg-surface-container-high text-[10px] font-medium text-on-surface-variant hover:bg-surface-container-highest transition-colors shrink-0"
+            title={lang === "zh" ? "Switch to English" : "切换中文"}
+          >
+            {lang === "zh" ? "EN" : "中"}
+          </button>
         </div>
 
         {/* Serial Connection */}
@@ -31,6 +43,7 @@ function App() {
           onConnect={serial.connect}
           onDisconnect={serial.disconnect}
           error={serial.error}
+          lang={m}
         />
 
         {/* Spacer */}
@@ -38,7 +51,7 @@ function App() {
 
         {/* Status footer */}
         <div className="flex items-center justify-between px-2 text-[11px] text-on-surface-variant">
-          <span>FPS</span>
+          <span>{m.fps}</span>
           <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
         </div>
       </nav>
@@ -59,20 +72,21 @@ function App() {
               )}
             </div>
             <div className="h-48 shrink-0 bg-surface border-t border-outline-variant/10 px-4 py-2">
-              <WaveChart history={serial.attitudeHistory} />
+              <WaveChart history={serial.attitudeHistory} lang={m} />
             </div>
           </div>
 
           {/* Right: Data Panel */}
           <aside className="w-56 bg-surface-container-low h-full overflow-y-auto no-scrollbar shrink-0">
             <div className="px-3 py-3 sticky top-0 bg-surface-container-low z-10">
-              <h2 className="font-headline text-[13px] font-bold text-on-surface">Data</h2>
+              <h2 className="font-headline text-[13px] font-bold text-on-surface">{m.data}</h2>
             </div>
             <div className="px-3 pb-4">
               <DataPanel
                 attitude={serial.attitude}
                 fps={serial.fps}
                 connected={serial.connected}
+                lang={m}
               />
             </div>
           </aside>

@@ -1,0 +1,45 @@
+const messages = {
+  en: {
+    brand: "Monitor",
+    subtitle: "Attitude Visualizer",
+    connect: "Connect",
+    disconnect: "Disconnect",
+    noPorts: "No devices found",
+    scanning: "Scanning...",
+    fps: "FPS",
+    data: "Data",
+    eulerAngles: "Euler Angles",
+    quaternion: "Quaternion",
+    angularVelocity: "Angular Velocity",
+    roll: "Roll",
+    pitch: "Pitch",
+    yaw: "Yaw",
+    eulerWave: "Euler Angles",
+    notConnected: "Not connected",
+  },
+  zh: {
+    brand: "Monitor",
+    subtitle: "姿态可视化",
+    connect: "连接",
+    disconnect: "断开",
+    noPorts: "未发现设备",
+    scanning: "扫描中...",
+    fps: "帧率",
+    data: "数据",
+    eulerAngles: "欧拉角",
+    quaternion: "四元数",
+    angularVelocity: "角速度",
+    roll: "横滚",
+    pitch: "俯仰",
+    yaw: "偏航",
+    eulerWave: "欧拉角波形",
+    notConnected: "未连接",
+  },
+} as const;
+
+export type Lang = keyof typeof messages;
+export type Messages = { [K in keyof (typeof messages)["en"]]: string };
+
+export function t(lang: Lang): Messages {
+  return messages[lang] as Messages;
+}

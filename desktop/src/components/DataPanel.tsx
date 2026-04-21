@@ -1,34 +1,36 @@
 import type { AttitudeData } from "../protocol";
+import type { Messages } from "../i18n";
 
 interface DataPanelProps {
   attitude: AttitudeData | null;
   fps: number;
   connected: boolean;
+  lang: Messages;
 }
 
 function fmt(n: number | undefined, d = 2): string {
   return n !== undefined ? n.toFixed(d) : "—";
 }
 
-export default function DataPanel({ attitude }: DataPanelProps) {
+export default function DataPanel({ attitude, lang }: DataPanelProps) {
   return (
     <div className="flex flex-col gap-4">
       {/* Euler Angles */}
       <section>
         <h3 className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
-          Euler Angles
+          {lang.eulerAngles}
         </h3>
         <div className="bg-surface-container-lowest rounded-md p-2.5 ambient-shadow-sm flex flex-col gap-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-on-surface-variant">Roll</span>
+            <span className="text-[11px] text-on-surface-variant">{lang.roll}</span>
             <span className="font-mono text-[12px] font-medium text-roll">{fmt(attitude?.roll)}°</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-on-surface-variant">Pitch</span>
+            <span className="text-[11px] text-on-surface-variant">{lang.pitch}</span>
             <span className="font-mono text-[12px] font-medium text-pitch">{fmt(attitude?.pitch)}°</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[11px] text-on-surface-variant">Yaw</span>
+            <span className="text-[11px] text-on-surface-variant">{lang.yaw}</span>
             <span className="font-mono text-[12px] font-medium text-yaw">{fmt(attitude?.yaw)}°</span>
           </div>
         </div>
@@ -37,7 +39,7 @@ export default function DataPanel({ attitude }: DataPanelProps) {
       {/* Quaternion */}
       <section>
         <h3 className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
-          Quaternion
+          {lang.quaternion}
         </h3>
         <div className="bg-surface-container-lowest rounded-md p-2.5 ambient-shadow-sm grid grid-cols-2 gap-x-3 gap-y-1">
           {(["q0", "q1", "q2", "q3"] as const).map((key) => (
@@ -52,7 +54,7 @@ export default function DataPanel({ attitude }: DataPanelProps) {
       {/* Angular Velocity */}
       <section>
         <h3 className="text-[10px] font-semibold text-on-surface-variant uppercase tracking-wider mb-2">
-          Angular Velocity
+          {lang.angularVelocity}
         </h3>
         <div className="bg-surface-container-lowest rounded-md p-2.5 ambient-shadow-sm flex flex-col gap-1.5">
           {([["Gx", attitude?.gx], ["Gy", attitude?.gy], ["Gz", attitude?.gz]] as const).map(([label, val]) => (

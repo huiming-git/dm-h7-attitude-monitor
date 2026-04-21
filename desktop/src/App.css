@@ -1,5 +1,26 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("./assets/fonts/HarmonyOS_SansSC_Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("./assets/fonts/HarmonyOS_SansSC_Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HarmonyOS Sans SC";
+  src: url("./assets/fonts/HarmonyOS_SansSC_Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-display: swap;
+}
+
 @theme {
   --color-primary: #0058bc;
   --color-primary-container: #0070eb;
@@ -20,8 +41,8 @@
   --color-pitch: #43a047;
   --color-yaw: #1e88e5;
 
-  --font-headline: "Manrope", "Inter", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
+  --font-headline: "HarmonyOS Sans SC", "Manrope", system-ui, sans-serif;
+  --font-body: "HarmonyOS Sans SC", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
