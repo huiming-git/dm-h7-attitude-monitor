@@ -18,7 +18,7 @@ function App() {
             H7
           </div>
           <div>
-            <div className="font-headline text-on-surface font-bold text-[13px] leading-tight">DM-H7 Monitor</div>
+            <div className="font-headline text-on-surface font-bold text-[13px] leading-tight">Monitor</div>
             <div className="text-on-surface-variant text-[11px]">Attitude Visualizer</div>
           </div>
         </div>
