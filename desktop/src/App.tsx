@@ -17,6 +17,8 @@ function App() {
   const [zoom, setZoom] = useState(100);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [model, setModel] = useState(() => Model.fromJson(createLayout(m) as IJsonModel));
+  const [sidebarWidth, setSidebarWidth] = useState(224);
+  const sidebarDragging = useRef(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   // 语言切换时更新所有 tab 名称
@@ -35,6 +37,25 @@ function App() {
   const resetLayout = () => {
     setModel(Model.fromJson(createLayout(m) as IJsonModel));
   };
+
+  const onSidebarDragStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    sidebarDragging.current = true;
+    const startX = e.clientX;
+    const startW = sidebarWidth;
+    const onMove = (ev: MouseEvent) => {
+      if (!sidebarDragging.current) return;
+      const newW = Math.max(180, Math.min(400, startW + ev.clientX - startX));
+      setSidebarWidth(newW);
+    };
+    const onUp = () => {
+      sidebarDragging.current = false;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [sidebarWidth]);
 
   const handleModelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -97,7 +118,7 @@ function App() {
   return (
     <div className="flex h-screen overflow-hidden" style={{ zoom: `${zoom}%` }}>
       {/* ── Sidebar ── */}
-      <nav className="flex flex-col bg-surface-container-low w-56 h-full py-5 px-4 shrink-0 z-10">
+      <nav className="flex flex-col bg-surface-container-low h-full py-5 px-4 shrink-0 z-10 relative" style={{ width: sidebarWidth }}>
         {/* Brand */}
         <div className="flex items-center gap-2.5 px-2 mb-4">
           <div className="w-8 h-8 rounded-md bg-gradient-to-br from-primary to-primary-container text-on-primary flex items-center justify-center font-headline font-bold text-xs">
@@ -201,6 +222,11 @@ function App() {
             <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
           </div>
         </div>
+        {/* Resize handle */}
+        <div
+          onMouseDown={onSidebarDragStart}
+          className="absolute top-0 right-0 w-1.5 h-full cursor-col-resize hover:bg-primary/20 active:bg-primary/30 transition-colors z-20"
+        />
       </nav>
 
       {/* ── FlexLayout Main ── */}
