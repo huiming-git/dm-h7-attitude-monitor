@@ -29,11 +29,11 @@
 - [ ] USB CDC 数据帧协议定义与发送
 - [ ] 可配置采样率 (100Hz / 200Hz / 500Hz)
 
-### 桌面端 (Tauri + Vue + Three.js)
+### 桌面端 (Tauri + React + R3F)
 
 - [ ] 串口连接管理 (自动扫描、连接、断开)
 - [ ] 数据帧解析
-- [ ] 3D 姿态渲染 (Three.js 实时旋转模型)
+- [ ] 3D 姿态渲染 (React Three Fiber 实时旋转模型)
 - [ ] 实时数据面板 (Roll / Pitch / Yaw 欧拉角显示)
 - [ ] 波形图 (加速度、角速度、欧拉角时序曲线)
 - [ ] 数据录制与回放 (CSV 导出)
@@ -62,10 +62,10 @@
 | 固件 RTOS | Zephyr 4.4 | 实时操作系统，驱动 SPI/USB |
 | 姿态解算 | Mahony Filter | 轻量级互补滤波，适合 Cortex-M7 |
 | 桌面框架 | Tauri 2.x | Rust 后端 + WebView 前端，轻量跨平台 |
-| 前端 | Vue 3 + TypeScript | 响应式 UI |
-| 3D 渲染 | Three.js | WebGL 3D 姿态可视化 |
+| 前端 | React 18 + TypeScript | 响应式 UI |
+| 3D 渲染 | React Three Fiber (R3F) | 声明式 Three.js，3D 姿态可视化 |
 | 串口通信 | tauri-plugin-serialplugin | Tauri 串口插件 |
-| 图表 | ECharts | 实时波形绘制 |
+| 图表 | Recharts | 实时波形绘制 |
 
 ## 目录结构
 
@@ -86,14 +86,14 @@ dm-h7-attitude-monitor/
 │   ├── src-tauri/           # Rust 后端
 │   │   └── src/
 │   │       └── main.rs
-│   ├── src/                 # Vue 前端
+│   ├── src/                 # React 前端
 │   │   ├── components/
-│   │   │   ├── Attitude3D.vue    # 3D 姿态渲染
-│   │   │   ├── DataPanel.vue     # 数据面板
-│   │   │   ├── WaveChart.vue     # 波形图
-│   │   │   └── SerialPort.vue    # 串口管理
-│   │   ├── App.vue
-│   │   └── main.ts
+│   │   │   ├── Attitude3D.tsx    # 3D 姿态渲染 (R3F)
+│   │   │   ├── DataPanel.tsx     # 数据面板
+│   │   │   ├── WaveChart.tsx     # 波形图
+│   │   │   └── SerialPort.tsx    # 串口管理
+│   │   ├── App.tsx
+│   │   └── main.tsx
 │   ├── package.json
 │   └── tauri.conf.json
 │
