@@ -2,7 +2,6 @@ import Attitude3D from "./components/Attitude3D";
 import DataPanel from "./components/DataPanel";
 import WaveChart from "./components/WaveChart";
 import SerialPort from "./components/SerialPort";
-import ConnectDialog from "./components/ConnectDialog";
 import { useSerial } from "./hooks/useSerial";
 import "./App.css";
 
@@ -11,16 +10,6 @@ function App() {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      {/* ── Connect Dialog ── */}
-      {serial.pendingPort && !serial.connected && (
-        <ConnectDialog
-          port={serial.pendingPort}
-          onConnect={serial.connect}
-          onDismiss={serial.dismissPending}
-          error={serial.error}
-        />
-      )}
-
       {/* ── Sidebar ── */}
       <nav className="flex flex-col bg-surface-container-low w-52 h-full py-4 px-3 shrink-0">
         {/* Brand */}
@@ -34,29 +23,23 @@ function App() {
           </div>
         </div>
 
-        {/* Serial Status */}
+        {/* Serial Connection */}
         <SerialPort
           ports={serial.ports}
           connected={serial.connected}
           currentPort={serial.currentPort}
+          onConnect={serial.connect}
           onDisconnect={serial.disconnect}
+          error={serial.error}
         />
 
         {/* Spacer */}
         <div className="flex-1" />
 
         {/* Status footer */}
-        <div className="flex flex-col gap-1 pt-3 mt-3 border-t border-outline-variant/15">
-          <div className="flex items-center justify-between px-2 text-[11px] text-on-surface-variant">
-            <span>FPS</span>
-            <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
-          </div>
-          <div className="flex items-center gap-2 px-2 text-[11px]">
-            <span className={`w-1.5 h-1.5 rounded-full ${serial.connected ? "bg-green-500" : "bg-outline-variant"}`} />
-            <span className="text-on-surface-variant truncate">
-              {serial.connected ? serial.currentPort : "Not connected"}
-            </span>
-          </div>
+        <div className="flex items-center justify-between px-2 text-[11px] text-on-surface-variant">
+          <span>FPS</span>
+          <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
         </div>
       </nav>
 
