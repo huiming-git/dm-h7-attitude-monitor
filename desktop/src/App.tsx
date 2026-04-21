@@ -10,10 +10,11 @@ import "./App.css";
 function App() {
   const serial = useSerial();
   const [lang, setLang] = useState<Lang>("zh");
+  const [zoom, setZoom] = useState(100);
   const m = t(lang);
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden" style={{ zoom: `${zoom}%` }}>
       {/* ── Sidebar ── */}
       <nav className="flex flex-col bg-surface-container-low w-56 h-full py-5 px-4 shrink-0">
         {/* Brand */}
@@ -49,10 +50,28 @@ function App() {
         {/* Spacer */}
         <div className="flex-1" />
 
-        {/* Status footer */}
-        <div className="flex items-center justify-between px-2 text-[12px] text-on-surface-variant">
-          <span>{m.fps}</span>
-          <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
+        {/* Footer */}
+        <div className="flex flex-col gap-2 pt-3 border-t border-outline-variant/15">
+          {/* Zoom */}
+          <div className="flex items-center justify-between px-2 text-[12px] text-on-surface-variant">
+            <span className="icon !text-[14px]">zoom_in</span>
+            <select
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="bg-surface-container-high border-none rounded py-0.5 px-1.5 text-[11px] text-on-surface font-mono focus:outline-none appearance-none cursor-pointer"
+            >
+              <option value={75}>75%</option>
+              <option value={100}>100%</option>
+              <option value={125}>125%</option>
+              <option value={150}>150%</option>
+              <option value={200}>200%</option>
+            </select>
+          </div>
+          {/* FPS */}
+          <div className="flex items-center justify-between px-2 text-[12px] text-on-surface-variant">
+            <span>{m.fps}</span>
+            <span className="font-mono font-medium text-on-surface">{serial.fps}</span>
+          </div>
         </div>
       </nav>
 
