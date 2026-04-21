@@ -80,6 +80,7 @@ export type ParseResult =
 
 export class FrameParser {
   private buffer: number[] = [];
+  private seqTime = 0; // 递增序列时间戳 (ms)
 
   feed(bytes: Uint8Array): ParseResult[] {
     const results: ParseResult[] = [];
@@ -104,7 +105,9 @@ export class FrameParser {
 
       const type = frame[2];
       const payload = frame.slice(4, 4 + payloadLen);
-      const now = Date.now();
+      // 每帧递增 5ms（200Hz 对应 5ms 间隔），保证 dt 不为零
+      this.seqTime += 5;
+      const now = this.seqTime;
 
       if (type === FRAME_TYPE_ATTITUDE && payloadLen === 28) {
         const q0 = readFloat32(payload, 0);
@@ -139,5 +142,6 @@ export class FrameParser {
 
   reset() {
     this.buffer = [];
+    this.seqTime = 0;
   }
 }

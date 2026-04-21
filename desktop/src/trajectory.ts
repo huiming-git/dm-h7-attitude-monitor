@@ -11,7 +11,7 @@ export interface TrajectoryPoint {
 }
 
 const GRAVITY = 9.81;
-const DECAY = 0.98; // 速度衰减系数，抑制积分漂移
+const DECAY = 0.999; // 速度衰减系数，轻微抑制积分漂移
 
 export class TrajectoryEstimator {
   private vx = 0;
@@ -38,7 +38,7 @@ export class TrajectoryEstimator {
     const dt = this.lastT > 0 ? (timestamp - this.lastT) / 1000 : 0;
     this.lastT = timestamp;
 
-    if (dt <= 0 || dt > 0.1) {
+    if (dt <= 0 || dt > 1.0) {
       // 第一帧或时间跳变，不积分
       const pt = { x: this.px, y: this.py, z: this.pz, t: timestamp };
       this.pushPoint(pt);
