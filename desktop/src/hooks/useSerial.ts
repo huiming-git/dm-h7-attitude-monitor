@@ -44,12 +44,18 @@ export function useSerial() {
   const scanPorts = useCallback(async () => {
     try {
       const portsMap = await SerialPort.available_ports();
-      const ports: PortEntry[] = Object.entries(portsMap).map(
-        ([path, info]) => ({
+      const ports: PortEntry[] = Object.entries(portsMap)
+        .filter(([path, info]) => {
+          // 只保留真实 USB 设备，过滤掉虚拟串口 /dev/ttyS*
+          if (/\/dev\/ttyS\d+$/.test(path)) return false;
+          if (path.startsWith("COM") || /ttyACM|ttyUSB|cu\.|tty\.usb/i.test(path)) return true;
+          if (info.type !== "PCI" && info.vid !== "Unknown") return true;
+          return false;
+        })
+        .map(([path, info]) => ({
           path,
           manufacturer: info.manufacturer !== "Unknown" ? info.manufacturer : undefined,
-        })
-      );
+        }));
       setState((s) => ({ ...s, ports }));
     } catch (e) {
       console.error("Scan failed:", e);
