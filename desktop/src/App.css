@@ -93,3 +93,58 @@ body {
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── FlexLayout overrides (Precision Gallery style) ── */
+.flexlayout__layout {
+  --color-tabset-background: #f3f3f3;
+  --color-tabset-header-background: #f3f3f3;
+  --color-tab-selected-background: #ffffff;
+  --color-tab-unselected-background: transparent;
+  --color-tab-selected: #1a1c1c;
+  --color-tab-unselected: #717786;
+  --color-splitter: #e2e2e2;
+  --color-splitter-hover: #c1c6d7;
+  --color-splitter-drag: #0058bc;
+  --color-drag-rect: rgba(0, 88, 188, 0.06);
+  --color-drag-rect-border: #0058bc;
+  --font-family: "HarmonyOS Sans SC", "Inter", system-ui, sans-serif;
+  --font-size: 12px;
+}
+
+.flexlayout__tab_button {
+  font-family: var(--font-family) !important;
+  font-size: 12px !important;
+  padding: 4px 12px !important;
+}
+
+.flexlayout__tab_button--selected {
+  font-weight: 500 !important;
+}
+
+.flexlayout__tabset-header {
+  border-bottom: none !important;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.flexlayout__splitter {
+  background: #eeeeee !important;
+}
+
+.flexlayout__splitter:hover {
+  background: #c1c6d7 !important;
+}
+
+.flexlayout__tab {
+  overflow: hidden;
+}
+
+.flexlayout__tabset_tabbar_outer {
+  background: #f3f3f3 !important;
+}
+
+/* 拖拽指示器 */
+.flexlayout__outline_rect {
+  border: 2px solid #0058bc !important;
+  border-radius: 4px;
+  background: rgba(0, 88, 188, 0.05) !important;
+}
