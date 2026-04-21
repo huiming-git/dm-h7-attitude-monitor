@@ -55,22 +55,34 @@ export function useSerial() {
   const frameCountRef = useRef(0);
   const fpsIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const connectedRef = useRef(false);
+  const rafRef = useRef<number>(0);
 
+  // ── Data buffer (written by serial callback, read by RAF) ──
+  const latestAttRef = useRef<AttitudeData | null>(null);
+  const latestRawRef = useRef<RawImuData | null>(null);
+  const attHistBufRef = useRef<AttitudeData[]>([]);
+  const rawHistBufRef = useRef<RawImuData[]>([]);
+  const dirtyRef = useRef(false);
+
+  // Process incoming bytes: parse frames, update refs (no setState!)
   const processBytes = useCallback((bytes: Uint8Array) => {
     const results = parserRef.current.feed(bytes);
     for (const result of results) {
       frameCountRef.current++;
       if (result.type === "attitude") {
         lastAttitudeRef.current = result.data;
-        setState((s) => ({
-          ...s,
-          attitude: result.data,
-          attitudeHistory: [
-            ...s.attitudeHistory.slice(-MAX_HISTORY + 1),
-            result.data,
-          ],
-        }));
+        latestAttRef.current = result.data;
+        attHistBufRef.current.push(result.data);
+        if (attHistBufRef.current.length > MAX_HISTORY) {
+          attHistBufRef.current = attHistBufRef.current.slice(-MAX_HISTORY);
+        }
       } else {
+        latestRawRef.current = result.data;
+        rawHistBufRef.current.push(result.data);
+        if (rawHistBufRef.current.length > MAX_HISTORY) {
+          rawHistBufRef.current = rawHistBufRef.current.slice(-MAX_HISTORY);
+        }
+        // Trajectory
         const att = lastAttitudeRef.current;
         if (att) {
           trajRef.current.update(
@@ -78,21 +90,35 @@ export function useSerial() {
             result.data.ax, result.data.ay, result.data.az,
             result.data.timestamp,
           );
-          const trajectory = [...trajRef.current.getPoints()];
-          setState((s) => ({
-            ...s,
-            rawImu: result.data,
-            rawHistory: [...s.rawHistory.slice(-MAX_HISTORY + 1), result.data],
-            trajectory,
-          }));
-        } else {
-          setState((s) => ({
-            ...s,
-            rawImu: result.data,
-            rawHistory: [...s.rawHistory.slice(-MAX_HISTORY + 1), result.data],
-          }));
         }
       }
+      dirtyRef.current = true;
+    }
+  }, []);
+
+  // RAF loop: sync refs → state at ~60fps
+  const startRafLoop = useCallback(() => {
+    const tick = () => {
+      if (dirtyRef.current) {
+        dirtyRef.current = false;
+        setState((s) => ({
+          ...s,
+          attitude: latestAttRef.current,
+          rawImu: latestRawRef.current,
+          attitudeHistory: [...attHistBufRef.current],
+          rawHistory: [...rawHistBufRef.current],
+          trajectory: [...trajRef.current.getPoints()],
+        }));
+      }
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+  }, []);
+
+  const stopRafLoop = useCallback(() => {
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = 0;
     }
   }, []);
 
@@ -132,40 +158,43 @@ export function useSerial() {
 
       parserRef.current.reset();
       frameCountRef.current = 0;
+      attHistBufRef.current = [];
+      rawHistBufRef.current = [];
+      latestAttRef.current = null;
+      latestRawRef.current = null;
 
-      // FPS counter
+      // FPS counter (1Hz)
       fpsIntervalRef.current = setInterval(() => {
         setState((s) => ({ ...s, fps: frameCountRef.current }));
         frameCountRef.current = 0;
       }, 1000);
 
-      // Use listen with raw binary mode via startListening
+      // Start RAF loop for UI sync
+      startRafLoop();
+
+      // Listen for serial data
       await port.listen((rawData: any) => {
         try {
           let bytes: Uint8Array;
           if (rawData instanceof Uint8Array) {
             bytes = rawData;
           } else if (rawData?.data) {
-            // { data: number[] } format
             bytes = new Uint8Array(rawData.data);
           } else if (typeof rawData === 'string') {
-            // String: each char is one byte (Latin-1)
             bytes = new Uint8Array(rawData.length);
             for (let i = 0; i < rawData.length; i++) {
               bytes[i] = rawData.charCodeAt(i) & 0xFF;
             }
           } else {
-            console.warn("[serial] unknown data format:", typeof rawData, rawData);
             return;
           }
           processBytes(bytes);
         } catch (e) {
           console.error("[serial] process error:", e);
         }
-      }, false); // false = binary mode
+      }, false);
 
       await port.startListening();
-      console.log("[serial] listening started on", path);
 
       portRef.current = port;
       connectedRef.current = true;
@@ -184,10 +213,11 @@ export function useSerial() {
       console.error("Connect failed:", e);
       setState((s) => ({ ...s, error: msg }));
     }
-  }, [processBytes]);
+  }, [processBytes, startRafLoop]);
 
   const disconnect = useCallback(async () => {
     try {
+      stopRafLoop();
       if (fpsIntervalRef.current) {
         clearInterval(fpsIntervalRef.current);
         fpsIntervalRef.current = null;
@@ -212,7 +242,7 @@ export function useSerial() {
       fps: 0,
       error: null,
     }));
-  }, []);
+  }, [stopRafLoop]);
 
   return { ...state, scanPorts, connect, disconnect };
 }
