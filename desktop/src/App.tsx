@@ -15,7 +15,11 @@ function App() {
   const [lang, setLang] = useState<Lang>("zh");
   const [zoom, setZoom] = useState(100);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
-  const [model] = useState(() => Model.fromJson(defaultLayout as IJsonModel));
+  const [model, setModel] = useState(() => Model.fromJson(defaultLayout as IJsonModel));
+
+  const resetLayout = () => {
+    setModel(Model.fromJson(defaultLayout as IJsonModel));
+  };
   const fileRef = useRef<HTMLInputElement>(null);
   const m = t(lang);
 
@@ -157,6 +161,14 @@ function App() {
 
         {/* Footer */}
         <div className="flex flex-col gap-2 pt-3 border-t border-outline-variant/15">
+          {/* Reset layout */}
+          <button
+            onClick={resetLayout}
+            className="flex items-center justify-center gap-1.5 mx-2 py-1.5 rounded-md bg-surface-container-high text-on-surface-variant text-[11px] font-medium hover:bg-surface-container-highest transition-colors"
+          >
+            <span className="icon !text-[14px]">dashboard_customize</span>
+            {m.resetLayout}
+          </button>
           <div className="flex items-center justify-between px-2 text-[12px] text-on-surface-variant">
             <span className="icon !text-[14px]">zoom_in</span>
             <select

@@ -1,17 +1,17 @@
 import { IJsonModel } from "flexlayout-react";
 
-// 默认布局：左侧 3D+波形，右侧数据面板（各个 section 作为 tab）
 export const defaultLayout: IJsonModel = {
   global: {
     tabEnableClose: false,
     tabEnableRename: false,
+    tabEnableDrag: false,       // 禁止拖拽移动 tab
     tabSetEnableMaximize: true,
-    tabSetEnableDrop: true,
-    tabSetEnableDrag: true,
-    tabSetMinWidth: 160,
-    tabSetMinHeight: 100,
-    borderEnableDrop: true,
-    splitterSize: 4,
+    tabSetEnableDrop: false,    // 禁止 drop
+    tabSetEnableDrag: false,    // 禁止拖拽 tabset
+    tabSetMinWidth: 120,
+    tabSetMinHeight: 80,
+    borderEnableDrop: false,
+    splitterSize: 5,
     splitterExtra: 4,
   },
   borders: [],
@@ -20,7 +20,6 @@ export const defaultLayout: IJsonModel = {
     weight: 100,
     children: [
       {
-        // 左侧：3D + 波形（上下分割）
         type: "row",
         weight: 65,
         children: [
@@ -41,13 +40,30 @@ export const defaultLayout: IJsonModel = {
         ],
       },
       {
-        // 右侧：数据面板各 section 作为独立 tab
-        type: "tabset",
+        type: "row",
         weight: 35,
         children: [
-          { type: "tab", name: "Euler Angles", component: "euler" },
-          { type: "tab", name: "Quaternion", component: "quaternion" },
-          { type: "tab", name: "Angular Velocity", component: "angular-velocity" },
+          {
+            type: "tabset",
+            weight: 34,
+            children: [
+              { type: "tab", name: "Euler Angles", component: "euler" },
+            ],
+          },
+          {
+            type: "tabset",
+            weight: 33,
+            children: [
+              { type: "tab", name: "Quaternion", component: "quaternion" },
+            ],
+          },
+          {
+            type: "tabset",
+            weight: 33,
+            children: [
+              { type: "tab", name: "Angular Velocity", component: "angular-velocity" },
+            ],
+          },
         ],
       },
     ],
